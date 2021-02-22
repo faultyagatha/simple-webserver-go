@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/faultyagatha/simple-webserver-go/pkg/config"
+	"github.com/faultyagatha/simple-webserver-go/pkg/models"
 )
 
 //a dictionary of functions to be used in the template
@@ -16,13 +17,19 @@ var functions = template.FuncMap{}
 
 var app *config.AppConfig
 
+//AddDefaultData adds default data to every page
+func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+
+	return td
+}
+
 //ConfigTemplate sets the config for the template package
 func ConfigTemplate(a *config.AppConfig) {
 	app = a
 }
 
 //Render renders golang templates
-func Render(w http.ResponseWriter, tmpl string) {
+func Render(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
 	var tc map[string]*template.Template
 	if app.UseCache {
 		tc = app.TmplCache
@@ -37,7 +44,9 @@ func Render(w http.ResponseWriter, tmpl string) {
 	}
 	//store the template in the buffer
 	buf := new(bytes.Buffer)
-	_ = t.Execute(buf, nil)
+	td = AddDefaultData(td)
+	_ = t.Execute(buf, td)
+
 	//we don't need the num of bytes, just check if there is no error
 	_, err := buf.WriteTo(w)
 	if err != nil {

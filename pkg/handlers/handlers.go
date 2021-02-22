@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/faultyagatha/simple-webserver-go/pkg/config"
+	"github.com/faultyagatha/simple-webserver-go/pkg/models"
 	"github.com/faultyagatha/simple-webserver-go/pkg/render"
 )
 
@@ -29,10 +30,10 @@ func NewHandlers(r *Repository) {
 
 // Home is the handler for the home page
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
-	render.Render(w, "home.page.tmpl")
+	render.Render(w, "home.page.tmpl", &models.TemplateData{})
 }
 
 // About is the handler for the about page
 func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
-	render.Render(w, "about.page.tmpl")
+	render.Render(w, "about.page.tmpl", &models.TemplateData{})
 }
