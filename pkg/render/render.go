@@ -7,27 +7,39 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+
+	"github.com/faultyagatha/simple-webserver-go/pkg/config"
 )
 
 //a dictionary of functions to be used in the template
 var functions = template.FuncMap{}
 
+var app *config.AppConfig
+
+//ConfigTemplate sets the config for the template package
+func ConfigTemplate(a *config.AppConfig) {
+	app = a
+}
+
 //Render renders golang templates
 func Render(w http.ResponseWriter, tmpl string) {
-	tc, err := MakeTmplCache()
-	if err != nil {
-		log.Fatal(err)
+	var tc map[string]*template.Template
+	if app.UseCache {
+		tc = app.TmplCache
+	} else {
+		tc, _ = MakeTmplCache()
 	}
+
 	//check if the template exists
 	t, ok := tc[tmpl]
 	if !ok {
-		log.Fatal(err)
+		log.Fatal("Could not get template from template cache")
 	}
 	//store the template in the buffer
 	buf := new(bytes.Buffer)
 	_ = t.Execute(buf, nil)
 	//we don't need the num of bytes, just check if there is no error
-	_, err = buf.WriteTo(w)
+	_, err := buf.WriteTo(w)
 	if err != nil {
 		fmt.Println("Error writing template to browser", err)
 	}
